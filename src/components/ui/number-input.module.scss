@@ -1,0 +1,22 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.input {
+  width: 100%;
+  max-width: 120px;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #ddd);
+  background: var(--surface, #fff);
+  color: var(--text-primary, #111);
+  font-size: 1rem;
+}

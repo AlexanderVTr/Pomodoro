@@ -1,0 +1,18 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.th {
+  text-align: left;
+  padding: 0.5rem 0.35rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.td {
+  padding: 0.45rem 0.35rem;
+  border-bottom: 1px solid var(--border);
+}

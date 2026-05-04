@@ -1,0 +1,48 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.track {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.trackOn {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.knobOn {
+  transform: translateX(20px);
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--session-muted, rgba(255, 255, 255, 0.9));
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}

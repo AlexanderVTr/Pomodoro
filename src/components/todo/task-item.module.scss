@@ -1,0 +1,66 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.active {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.title {
+  flex: 1 1 140px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.95rem;
+  min-width: 0;
+}
+
+.title:disabled {
+  opacity: 0.65;
+  text-decoration: line-through;
+}
+
+.est {
+  width: 52px;
+  padding: 0.25rem 0.35rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.iconBtn {
+  border: none;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.iconBtn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.iconBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

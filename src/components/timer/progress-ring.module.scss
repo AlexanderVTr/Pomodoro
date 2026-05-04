@@ -1,0 +1,18 @@
+.svg {
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 6;
+}
+
+.progress {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.2s linear;
+}

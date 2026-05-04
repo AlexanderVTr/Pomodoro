@@ -1,0 +1,67 @@
+// Session accent colors (Pomofocus-inspired)
+$color-focus: #ba4949;
+$color-focus-dark: #8f3838;
+$color-short: #38858a;
+$color-short-dark: #2b6a66;
+$color-long: #397097;
+$color-long-dark: #2c5675;
+
+:root {
+  --session-bg: #{$color-focus};
+  --session-bg-deep: #{$color-focus-dark};
+  --session-text: #ffffff;
+  --session-muted: rgba(255, 255, 255, 0.85);
+  --session-card: rgba(255, 255, 255, 0.12);
+  --session-border: rgba(255, 255, 255, 0.2);
+  --session-shadow: rgba(0, 0, 0, 0.15);
+
+  --surface: #ffffff;
+  --surface-elevated: #f8f8f8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5c5c5c;
+  --border: #e6e6e6;
+  --accent: #ba4949;
+  --danger: #c62828;
+  --success: #2e7d32;
+}
+
+html[data-session="focus"] {
+  --session-bg: #{$color-focus};
+  --session-bg-deep: #{$color-focus-dark};
+}
+
+html[data-session="shortBreak"] {
+  --session-bg: #{$color-short};
+  --session-bg-deep: #{$color-short-dark};
+}
+
+html[data-session="longBreak"] {
+  --session-bg: #{$color-long};
+  --session-bg-deep: #{$color-long-dark};
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #1c1c1c;
+  --surface-elevated: #262626;
+  --text-primary: #f2f2f2;
+  --text-secondary: #a3a3a3;
+  --border: #333333;
+  --accent: #e57373;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+    --surface: #1c1c1c;
+    --surface-elevated: #262626;
+    --text-primary: #f2f2f2;
+    --text-secondary: #a3a3a3;
+    --border: #333333;
+    --accent: #e57373;
+  }
+}

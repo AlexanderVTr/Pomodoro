@@ -1,0 +1,41 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.08s ease, opacity 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.primary {
+  composes: btn;
+  background: #ffffff;
+  color: var(--session-bg-deep, #333);
+}
+
+.ghost {
+  composes: btn;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.danger {
+  composes: btn;
+  background: rgba(0, 0, 0, 0.15);
+  color: #fff;
+}
+
+.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
