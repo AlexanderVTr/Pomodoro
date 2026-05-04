@@ -27,6 +27,9 @@ interface PersistedShape {
 
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
 
+/** Prevents tick + timeout both running session transition logic. */
+let sessionTransitionLock = false;
+
 function clearCompletionTimer(): void {
   if (completionTimer) {
     clearTimeout(completionTimer);
@@ -96,101 +99,143 @@ export const useTimerStore = create<TimerStoreState>((set, get) => {
   }
 
   async function finalizeNaturalComplete(): Promise<void> {
-    const state = get();
-    clearCompletionTimer();
-    if (!state.sessionStartedAt) return;
+    if (sessionTransitionLock) return;
+    sessionTransitionLock = true;
+    try {
+      const state = get();
+      clearCompletionTimer();
+      if (!state.sessionStartedAt) return;
 
-    const now = Date.now();
-    const planned = plannedDurationSeconds(state.sessionType, state.settings);
-    const actual = Math.round((now - state.sessionStartedAt) / 1000);
+      const now = Date.now();
+      const planned = plannedDurationSeconds(state.sessionType, state.settings);
+      const actual = Math.round((now - state.sessionStartedAt) / 1000);
 
-    await addSession({
-      type: state.sessionType,
-      taskId: state.activeTaskId ?? undefined,
-      startedAt: state.sessionStartedAt,
-      endedAt: now,
-      plannedDurationSec: planned,
-      actualDurationSec: Math.min(actual, planned),
-      completed: true,
-    });
+      await addSession({
+        type: state.sessionType,
+        taskId: state.activeTaskId ?? undefined,
+        startedAt: state.sessionStartedAt,
+        endedAt: now,
+        plannedDurationSec: planned,
+        actualDurationSec: Math.min(actual, planned),
+        completed: true,
+      });
 
-    let completedFocusCount = state.completedFocusCount;
-    if (state.sessionType === "focus") {
-      if (state.activeTaskId) {
-        await incrementTaskPomodoro(state.activeTaskId);
+      let completedFocusCount = state.completedFocusCount;
+      if (state.sessionType === "focus") {
+        if (state.activeTaskId) {
+          await incrementTaskPomodoro(state.activeTaskId);
+        }
+        completedFocusCount += 1;
       }
-      completedFocusCount += 1;
-    }
 
-    playAlarm(state.settings.alarmSound, state.settings.alarmVolume);
-    notifySessionComplete(
-      labelForSession(state.sessionType),
-      "Time for the next step.",
-      state.settings.notificationsEnabled
-    );
+      playAlarm(state.settings.alarmSound, state.settings.alarmVolume);
+      notifySessionComplete(
+        labelForSession(state.sessionType),
+        "Time for the next step.",
+        state.settings.notificationsEnabled
+      );
 
-    const nextType =
-      state.sessionType === "focus"
-        ? nextSessionAfterFocusComplete(completedFocusCount, state.settings)
-        : nextSessionAfterBreakComplete();
+      const manual = !state.settings.autoSwitch;
 
-    const nextDuration = plannedDurationSeconds(nextType, state.settings);
+      if (state.sessionType === "focus" && manual) {
+        set((s) => ({
+          ...s,
+          completedFocusCount,
+          sessionType: "focus",
+          completionToken: s.completionToken + 1,
+          sessionStartedAt: null,
+          endsAt: null,
+          pausedRemainingSec: 0,
+          isRunning: false,
+        }));
+      } else {
+        const nextType =
+          state.sessionType === "focus"
+            ? nextSessionAfterFocusComplete(completedFocusCount, state.settings)
+            : nextSessionAfterBreakComplete();
 
-    set((s) => ({
-      ...s,
-      completedFocusCount,
-      sessionType: nextType,
-      completionToken: s.completionToken + 1,
-      sessionStartedAt: null,
-      endsAt: null,
-      pausedRemainingSec: nextDuration,
-      isRunning: false,
-    }));
+        const nextDuration = plannedDurationSeconds(nextType, state.settings);
 
-    if (get().settings.autoSwitch) {
-      get().start();
+        set((s) => ({
+          ...s,
+          completedFocusCount,
+          sessionType: nextType,
+          completionToken: s.completionToken + 1,
+          sessionStartedAt: null,
+          endsAt: null,
+          pausedRemainingSec: nextDuration,
+          isRunning: false,
+        }));
+
+        if (!manual) {
+          get().start();
+        }
+      }
+    } finally {
+      sessionTransitionLock = false;
     }
   }
 
   async function finalizeSkip(): Promise<void> {
-    const state = get();
-    clearCompletionTimer();
-    const now = Date.now();
-    const planned = plannedDurationSeconds(state.sessionType, state.settings);
-    const started = state.sessionStartedAt ?? now;
-    const actual = Math.max(0, Math.round((now - started) / 1000));
+    if (sessionTransitionLock) return;
+    sessionTransitionLock = true;
+    try {
+      const state = get();
+      clearCompletionTimer();
+      const now = Date.now();
+      const planned = plannedDurationSeconds(state.sessionType, state.settings);
+      const started = state.sessionStartedAt ?? now;
+      const actual = Math.max(0, Math.round((now - started) / 1000));
 
-    await addSession({
-      type: state.sessionType,
-      taskId: state.activeTaskId ?? undefined,
-      startedAt: started,
-      endedAt: now,
-      plannedDurationSec: planned,
-      actualDurationSec: Math.min(actual, planned),
-      completed: false,
-    });
+      await addSession({
+        type: state.sessionType,
+        taskId: state.activeTaskId ?? undefined,
+        startedAt: started,
+        endedAt: now,
+        plannedDurationSec: planned,
+        actualDurationSec: Math.min(actual, planned),
+        completed: false,
+      });
 
-    const completedFocusCount = state.completedFocusCount;
-    const nextType: SessionType =
-      state.sessionType === "focus"
-        ? nextSessionAfterFocusSkip()
-        : nextSessionAfterBreakComplete();
+      const completedFocusCount = state.completedFocusCount;
+      const manual = !state.settings.autoSwitch;
 
-    const nextDuration = plannedDurationSeconds(nextType, state.settings);
+      if (state.sessionType === "focus" && manual) {
+        set((s) => ({
+          ...s,
+          completedFocusCount,
+          sessionType: "focus",
+          completionToken: s.completionToken + 1,
+          sessionStartedAt: null,
+          endsAt: null,
+          pausedRemainingSec: 0,
+          isRunning: false,
+        }));
+      } else {
+        const nextType: SessionType =
+          state.sessionType === "focus"
+            ? nextSessionAfterFocusSkip()
+            : nextSessionAfterBreakComplete();
 
-    set((s) => ({
-      ...s,
-      completedFocusCount,
-      sessionType: nextType,
-      completionToken: s.completionToken + 1,
-      sessionStartedAt: null,
-      endsAt: null,
-      pausedRemainingSec: nextDuration,
-      isRunning: false,
-    }));
+        const nextDuration = plannedDurationSeconds(nextType, state.settings);
 
-    if (get().settings.autoSwitch) {
-      get().start();
+        set((s) => ({
+          ...s,
+          completedFocusCount,
+          sessionType: nextType,
+          completionToken: s.completionToken + 1,
+          sessionStartedAt: null,
+          endsAt: null,
+          pausedRemainingSec: nextDuration,
+          isRunning: false,
+        }));
+
+        if (!manual) {
+          get().start();
+        }
+      }
+    } finally {
+      sessionTransitionLock = false;
     }
   }
 
@@ -235,8 +280,8 @@ export const useTimerStore = create<TimerStoreState>((set, get) => {
       });
     },
 
-    setAutoSwitch: (autoSwitch) => {
-      void saveSettings({ autoSwitch });
+    setAutoSwitch: async (autoSwitch) => {
+      await saveSettings({ autoSwitch });
       set((s) => {
         const settings = { ...s.settings, autoSwitch };
         return { ...s, settings };

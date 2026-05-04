@@ -17,7 +17,7 @@ export interface TimerStoreState extends TimerSnapshot {
   setSettings: (s: AppSettings) => void;
   setActiveTaskId: (id: string | null) => void;
   setSessionType: (t: SessionType) => void;
-  setAutoSwitch: (v: boolean) => void;
+  setAutoSwitch: (v: boolean) => Promise<void>;
   start: () => void;
   pause: () => void;
   toggle: () => void;
