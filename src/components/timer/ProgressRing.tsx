@@ -3,12 +3,15 @@ import styles from "./progress-ring.module.scss";
 interface ProgressRingProps {
   size: number;
   progress: number;
+  /** Hide from assistive tech when wrapped in a control that provides the label */
+  decorative?: boolean;
   "aria-label"?: string;
 }
 
 export function ProgressRing({
   size,
   progress,
+  decorative,
   "aria-label": ariaLabel,
 }: ProgressRingProps) {
   const stroke = 6;
@@ -22,8 +25,9 @@ export function ProgressRing({
       width={size}
       height={size}
       className={styles.svg}
-      role="img"
-      aria-label={ariaLabel}
+      role={decorative ? undefined : "img"}
+      aria-hidden={decorative ? true : undefined}
+      aria-label={decorative ? undefined : ariaLabel}
     >
       <circle className={styles.track} cx={size / 2} cy={size / 2} r={r} />
       <circle

@@ -149,11 +149,10 @@ export const useTimerStore = create<TimerStoreState>((set, get) => {
           isRunning: false,
         }));
       } else {
-        const nextType =
+        const nextType: SessionType =
           state.sessionType === "focus"
             ? nextSessionAfterFocusComplete(completedFocusCount, state.settings)
             : nextSessionAfterBreakComplete();
-
         const nextDuration = plannedDurationSeconds(nextType, state.settings);
 
         set((s) => ({
@@ -216,7 +215,6 @@ export const useTimerStore = create<TimerStoreState>((set, get) => {
           state.sessionType === "focus"
             ? nextSessionAfterFocusSkip()
             : nextSessionAfterBreakComplete();
-
         const nextDuration = plannedDurationSeconds(nextType, state.settings);
 
         set((s) => ({
@@ -281,7 +279,12 @@ export const useTimerStore = create<TimerStoreState>((set, get) => {
     },
 
     setAutoSwitch: async (autoSwitch) => {
-      await saveSettings({ autoSwitch });
+      try {
+        await saveSettings({ autoSwitch });
+      } catch (err) {
+        console.error("[timer] Failed to persist autoSwitch", err);
+        return;
+      }
       set((s) => {
         const settings = { ...s.settings, autoSwitch };
         return { ...s, settings };

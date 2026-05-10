@@ -3,7 +3,6 @@
 import { SessionTabs } from "@/components/timer/SessionTabs";
 import { TimerDisplay } from "@/components/timer/TimerDisplay";
 import { DailyPomodoroShelf } from "@/components/timer/DailyPomodoroShelf";
-import { TimerControls } from "@/components/timer/TimerControls";
 import { AutoSwitchToggle } from "@/components/timer/AutoSwitchToggle";
 import { ActiveTaskBanner } from "@/components/todo/ActiveTaskBanner";
 import { TaskList } from "@/components/todo/TaskList";
@@ -21,7 +20,6 @@ export function HomePageClient() {
         <SessionTabs />
         <TimerDisplay />
         <DailyPomodoroShelf />
-        <TimerControls />
         <AutoSwitchToggle />
         <div className={styles.panel}>
           <ActiveTaskBanner />

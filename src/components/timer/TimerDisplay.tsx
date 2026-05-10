@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { formatSeconds } from "@/lib/utils/format-time";
 import { plannedDurationSeconds } from "@/lib/timer/timer-logic";
 import { useTimerStore } from "@/lib/timer/timer-store";
+import { Pause, Play, SkipForward } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import styles from "./timer-display.module.scss";
 
@@ -15,6 +16,8 @@ export function TimerDisplay() {
   const endsAt = useTimerStore((s) => s.endsAt);
   const pausedRemainingSec = useTimerStore((s) => s.pausedRemainingSec);
   const settings = useTimerStore((s) => s.settings);
+  const toggle = useTimerStore((s) => s.toggle);
+  const skip = useTimerStore((s) => s.skip);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -50,24 +53,69 @@ export function TimerDisplay() {
         : "Long break remaining";
 
   const ringPx = 280;
+  const toggleLabel = isRunning ? "Pause timer" : "Start timer";
 
   return (
     <div
       className={styles.wrap}
       style={{ "--timer-ring": `${ringPx}px` } as CSSProperties}
     >
-      <ProgressRing
-        size={ringPx}
-        progress={progress}
-        aria-label={label}
-      />
-      <div className={styles.inner}>
-        <div
-          className={styles.time}
-          aria-live="polite"
-          aria-label={`${label}, ${formatSeconds(remainingSec)}`}
-        >
-          {formatSeconds(remainingSec)}
+      <div className={styles.disc}>
+        <ProgressRing size={ringPx} progress={progress} decorative />
+        <button
+          type="button"
+          className={styles.discToggle}
+          tabIndex={-1}
+          aria-hidden
+          onClick={() => toggle()}
+        />
+        <div className={styles.overlay}>
+          <div className={styles.timeSlot}>
+            <div
+              className={styles.time}
+              aria-live="polite"
+              aria-label={`${label}, ${formatSeconds(remainingSec)}`}
+            >
+              {formatSeconds(remainingSec)}
+            </div>
+          </div>
+        </div>
+        <div className={styles.bottomDock}>
+          <button
+            type="button"
+            className={styles.toolBtnMain}
+            aria-label={toggleLabel}
+            onClick={() => toggle()}
+          >
+            {isRunning ? (
+              <Pause
+                className={styles.iconMain}
+                aria-hidden
+                strokeWidth={2.25}
+                absoluteStrokeWidth
+              />
+            ) : (
+              <Play
+                className={styles.iconMain}
+                aria-hidden
+                strokeWidth={2.25}
+                absoluteStrokeWidth
+              />
+            )}
+          </button>
+          <button
+            type="button"
+            className={styles.toolBtnSkip}
+            aria-label="Skip session"
+            onClick={() => skip()}
+          >
+            <SkipForward
+              className={styles.iconSkip}
+              aria-hidden
+              strokeWidth={2}
+              absoluteStrokeWidth
+            />
+          </button>
         </div>
       </div>
     </div>

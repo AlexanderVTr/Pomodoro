@@ -8,12 +8,16 @@ export function AutoSwitchToggle() {
   const autoSwitch = useTimerStore((s) => s.settings.autoSwitch);
   const setAutoSwitch = useTimerStore((s) => s.setAutoSwitch);
 
+  const handleAutoSwitchChange = (checked: boolean) => {
+    void setAutoSwitch(checked);
+  };
+
   return (
     <div className={styles.wrap}>
       <Toggle
-        label="Auto-switch & auto-start next session"
+        label="Auto-start timer after each session"
         checked={autoSwitch}
-        onChange={(e) => setAutoSwitch(e.target.checked)}
+        onChange={(e) => handleAutoSwitchChange(e.target.checked)}
       />
     </div>
   );
